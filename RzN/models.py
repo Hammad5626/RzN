@@ -22,7 +22,7 @@ class Timezone(models.Model):
 class Player(models.Model):
     name = models.CharField(max_length=100)
     hq_level = models.IntegerField()
-    power = models.BigIntegerField()
+    power = models.DecimalField(max_digits=20, decimal_places=2)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     timezone = models.ForeignKey(Timezone, on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True)

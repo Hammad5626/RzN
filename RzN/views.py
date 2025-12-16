@@ -27,9 +27,9 @@ def home(request):
                 hour = local_dt.hour
 
                 if 2 <= hour < 5:
-                    time_class = "bg-danger text-white"
+                    time_class = "danger-time"
                 elif 0 <= hour < 2 or 5 <= hour < 7:
-                    time_class = "bg-warning"
+                    time_class = "warning-time"
                 else:
                     time_class = ""
 
