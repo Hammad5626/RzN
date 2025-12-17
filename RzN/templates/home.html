@@ -12,6 +12,10 @@
         background-color: #ffc107 !important;
         color: #000 !important;
     }
+    tbody tr {
+        transition: transform 0.25s ease, background-color 0.25s ease;
+    }
+
 </style>
 {% endblock %}
 
@@ -45,27 +49,116 @@
 {% endif %}
 
 {% if converted_times %}
+<div class="d-flex justify-content-start mb-3">
+    <div class="card shadow-sm border-primary" style="max-width: 320px;">
+        <div class="card-body py-2">
+            <label class="form-label fw-semibold text-primary mb-1">
+                Sort Players
+            </label>
+            <select id="sortSelect" class="form-select form-select-sm">
+                <option value="">Default</option>
+
+                <optgroup label="Power">
+                    <option value="power_desc">Power (High → Low)</option>
+                    <option value="power_asc">Power (Low → High)</option>
+                </optgroup>
+
+                <optgroup label="HQ Level">
+                    <option value="hq_desc">HQ (High → Low)</option>
+                    <option value="hq_asc">HQ (Low → High)</option>
+                </optgroup>
+
+                <optgroup label="Name">
+                    <option value="name_asc">Name (A → Z)</option>
+                    <option value="name_desc">Name (Z → A)</option>
+                </optgroup>
+
+                <optgroup label="Availability">
+                    <option value="unavailable">Most Unavailable</option>
+                </optgroup>
+            </select>
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive">
 <table class="table table-bordered">
     <thead class="table-dark">
         <tr>
             <th>Player</th>
+            <th>HQ</th>
             <th>Power</th>
             <th>Country</th>
             <th>Local Time</th>
         </tr>
     </thead>
-    <tbody>
-        {% for p in converted_times %}
-        <tr class="{{ p.time_class }}">
+    <tbody id="playersTable">
+    {% for p in converted_times %}
+        <tr class="{{ p.time_class }}"
+                data-name="{{ p.name|lower }}"
+                data-power="{{ p.power }}"
+                data-hq="{{ p.hq }}"
+                data-availability="{% if p.time_class == 'danger-time' %}0{% elif p.time_class == 'warning-time' %}1{% else %}2{% endif %}">
             <td>{{ p.name }}</td>
+            <td>{{ p.hq }}</td>
             <td>{{ p.power|intcomma }} M</td>
-            <td>{{ p.country }}</td>
+            <td>{{ p.country.flag }} {{ p.country.name }}</td>
             <td>{{ p.local_time }}</td>
         </tr>
-        {% endfor %}
+    {% endfor %}
     </tbody>
 </table>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+const sortSelect = document.getElementById('sortSelect')
+const tbody = document.getElementById('playersTable')
+
+sortSelect.addEventListener('change', () => {
+    const rows = Array.from(tbody.querySelectorAll('tr'))
+    const value = sortSelect.value
+
+    let sortedRows = [...rows]
+
+    switch (value) {
+        case 'power_desc':
+            sortedRows.sort((a, b) => b.dataset.power - a.dataset.power)
+            break
+
+        case 'power_asc':
+            sortedRows.sort((a, b) => a.dataset.power - b.dataset.power)
+            break
+
+        case 'hq_desc':
+            sortedRows.sort((a, b) => b.dataset.hq - a.dataset.hq)
+            break
+
+        case 'hq_asc':
+            sortedRows.sort((a, b) => a.dataset.hq - b.dataset.hq)
+            break
+
+        case 'name_asc':
+            sortedRows.sort((a, b) => a.dataset.name.localeCompare(b.dataset.name))
+            break
+
+        case 'name_desc':
+            sortedRows.sort((a, b) => b.dataset.name.localeCompare(a.dataset.name))
+            break
+
+        case 'unavailable':
+            sortedRows.sort((a, b) => a.dataset.availability - b.dataset.availability)
+            break
+
+        default:
+            return
+    }
+
+    tbody.innerHTML = ''
+    sortedRows.forEach(row => tbody.appendChild(row))
+})
+</script>
+
 {% endblock %}

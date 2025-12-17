@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Edit Player</h1>
+
+<div class="card p-4">
+<form method="post" class="row g-3">
+    {% csrf_token %}
+
+    <div class="col-md-6">
+        <label class="form-label">Player Name</label>
+        <input type="text" class="form-control" name="name"
+               value="{{ player.name }}" required>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">HQ Level</label>
+        <input type="number" class="form-control" name="hq_level"
+               value="{{ player.hq_level }}" required>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Power</label>
+        <input type="number" step="0.01" class="form-control" name="power"
+               value="{{ player.power }}" required>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Country</label>
+        <select id="country" name="country" class="form-select">
+            {% for c in countries %}
+            <option value="{{ c.id }}"
+                {% if player.country.id == c.id %}selected{% endif %}>
+                {{ c.flag }} {{ c.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Timezone</label>
+        <select id="timezone" name="timezone" class="form-select">
+            <option value="{{ player.timezone.id }}">
+                {{ player.timezone.zone_name }}
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-3 form-check mt-3">
+        <input type="checkbox" class="form-check-input" name="is_active"
+               {% if player.is_active %}checked{% endif %}>
+        <label class="form-check-label">Active</label>
+    </div>
+
+    <div class="col-md-3 form-check mt-3">
+        <input type="checkbox" class="form-check-input" name="is_key_player"
+               {% if player.is_key_player %}checked{% endif %}>
+        <label class="form-check-label">Key Player</label>
+    </div>
+
+    <div class="col-12 mt-3">
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a href="{% url 'players' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+</div>
+{% endblock %}
